@@ -18,18 +18,17 @@ import android.widget.TextView;
 import cn.xxd.tx.FriendA;
 import cn.xxd.tx.R;
 import cn.xxd.tx.util.QConfig;
+import q.frame.QDialog;
 import q.util.QFile;
 import q.util.QHttp;
-import q.util.a.QLog;
 import q.util.a.view.QBaseAdapter;
-import q.util.a.view.QOauth;
-import q.util.view.QDialog;
+import q.util.a.view.QLayoutOauth;
 
-public class TokenAdapter extends QBaseAdapter<QOauth.Token> implements OnClickListener {
+public class TokenAdapter extends QBaseAdapter<QLayoutOauth.Token> implements OnClickListener {
 	
 	QHttp qHttp;
 
-	public TokenAdapter(Context ctx, List<QOauth.Token> data, final ListView lv) {
+	public TokenAdapter(Context ctx, List<QLayoutOauth.Token> data, final ListView lv) {
 		super(ctx, data);
 		qHttp = new QHttp(10, QFile.get("login"), QConfig.CACHE_EXPIRE_PIC, new QHttp.CallbackBitmapList() {
 			
@@ -66,17 +65,17 @@ public class TokenAdapter extends QBaseAdapter<QOauth.Token> implements OnClickL
 	}
 
 	@Override
-	protected void onInitItem(int position, final QOauth.Token data, Object viewHolder) {
+	protected void onInitItem(int position, final QLayoutOauth.Token data, Object viewHolder) {
 		Holder h = (Holder)viewHolder;
 		//
 		h.ivPic.setTag(position);
 		//
-		switch(data.getType()){
-		case QOauth.TYPE_SINA_WEIBO: h.ivLogo.setBackgroundResource(R.drawable.logo_sinaweibo); break;
-		case QOauth.TYPE_QQ_WEIBO: h.ivLogo.setBackgroundResource(R.drawable.logo_qqweibo); break;
-		case QOauth.TYPE_QZONE: h.ivLogo.setBackgroundResource(R.drawable.logo_qqzone); break;
-		case QOauth.TYPE_RENREN: h.ivLogo.setBackgroundResource(R.drawable.logo_renren); break;
-		}
+		/*switch(data.getType()){
+		case QLayoutOauth.TYPE_SINA_WEIBO: h.ivLogo.setBackgroundResource(R.drawable.logo_sinaweibo); break;
+		case QLayoutOauth.TYPE_QQ_WEIBO: h.ivLogo.setBackgroundResource(R.drawable.logo_qqweibo); break;
+		case QLayoutOauth.TYPE_QZONE: h.ivLogo.setBackgroundResource(R.drawable.logo_qqzone); break;
+		case QLayoutOauth.TYPE_RENREN: h.ivLogo.setBackgroundResource(R.drawable.logo_renren); break;
+		}*/
 		//
 		h.tvName.setText(data.getName());
 		//
@@ -85,7 +84,7 @@ public class TokenAdapter extends QBaseAdapter<QOauth.Token> implements OnClickL
 		//
 		h.btnDelete.setTag(data);
 		h.btnDelete.setOnClickListener(this);
-		qHttp.get(data.getPic(), position);
+		qHttp.get(data.getPhoto(), position);
 	}
 	
 	class Holder {
@@ -100,22 +99,21 @@ public class TokenAdapter extends QBaseAdapter<QOauth.Token> implements OnClickL
 	public void onClick(View v) {
 		switch(v.getId()){
 		case R.id.login_item:
-			onClickItem((QOauth.Token)v.getTag());
+			onClickItem((QLayoutOauth.Token)v.getTag());
 			break;
 		case R.id.login_delete:
-			onClickDelete((QOauth.Token)v.getTag());
+			onClickDelete((QLayoutOauth.Token)v.getTag());
 			break;
 		}
 	}
 	
-	private void onClickItem(QOauth.Token data){
+	private void onClickItem(QLayoutOauth.Token data){
 		QConfig.TOKEN = data;
 		ctx.startActivity(new Intent(ctx, FriendA.class));
 	}
 	
-	private void onClickDelete(QOauth.Token data){
-		final QDialog.Simple dialogDelete = new QDialog.Simple(ctx);
-		dialogDelete.setText("确定要删除<" + data.getName() + ">吗？");
+	private void onClickDelete(QLayoutOauth.Token data){
+		final QDialog.Simple dialogDelete = new QDialog.Simple(ctx, "确定要删除<" + data.getName() + ">吗？");
 		dialogDelete.addBtn("确定", new OnClickListener() {
 			
 			@Override

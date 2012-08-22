@@ -11,17 +11,17 @@ import cn.xxd.tx.adapter.FriendAdapter;
 import cn.xxd.tx.bean.Friend;
 import cn.xxd.tx.util.QConfig;
 
+import q.frame.QDialog;
 import q.util.QFile;
 import q.util.QHttp;
-import q.util.a.QLog;
+import q.util.QLog;
 import q.util.a.QPinyin;
 import q.util.a.QPinyin.IPinyin;
 import q.util.a.QPinyin.Pinyin;
-import q.util.a.view.QOauth;
-import q.util.a.view.QOauth.Token;
-import q.util.a.view.QOauth.UnAuthException;
+import q.util.a.view.QLayoutOauth;
+import q.util.a.view.QLayoutOauth.Token;
+import q.util.a.view.QLayoutOauth.UnAuthException;
 import q.util.a.view.QListViewPinyin;
-import q.util.view.QDialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -209,7 +209,7 @@ public class FriendA extends Activity implements OnClickListener, OnItemClickLis
 	
 	private void onGetCount(){
 		QLog.log("onGetCount");
-		qhttp.get(QOauth.qSinaWeiboUsersShow(QConfig.TOKEN));
+		qhttp.get(QLayoutOauth.HandleSinaWeibo.urlUsersShow(QConfig.TOKEN));
 	}
 	
 	private void onGetCountSuccess(int friendsCount){
@@ -229,7 +229,7 @@ public class FriendA extends Activity implements OnClickListener, OnItemClickLis
 		QLog.log("onGetIndex 线程需求：" + friendPageCount);
 		for(int i = 0; i < friendPageCount; i++){
 			try {
-				qhttp2.get(QOauth.qSinaWeiboFriends(QConfig.TOKEN, 50, i * 50));
+				qhttp2.get(QLayoutOauth.HandleSinaWeibo.urlFriends(QConfig.TOKEN, 50, i * 50));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

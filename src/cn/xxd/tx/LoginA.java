@@ -3,9 +3,14 @@ package cn.xxd.tx;
 import java.util.ArrayList;
 import java.util.List;
 
-import q.util.a.QLog;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
+
+import q.frame.QActivity;
+import q.util.QLog;
 import q.util.a.view.QListView;
-import q.util.a.view.QOauth;
+import q.util.a.view.QLayoutOauth;
 import cn.xxd.tx.R.id;
 import cn.xxd.tx.adapter.TokenAdapter;
 import cn.xxd.tx.bean.TokenDB;
@@ -22,9 +27,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ListView;
 
-public class LoginA extends Activity implements OnClickListener {
+public class LoginA extends QActivity implements OnClickListener {
 	
-	List<QOauth.Token> listToken;
+	List<QLayoutOauth.Token> listToken;
 	TokenAdapter adapter;
 	
 	@Override
@@ -48,6 +53,26 @@ public class LoginA extends Activity implements OnClickListener {
 		//
 		adapter = new TokenAdapter(this, listToken, lv);
 		lv.setAdapter(adapter);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		SubMenu sub = menu.addSubMenu("绑定帐号");
+		MenuItem item = sub.getItem();
+		item.setIcon(R.drawable.a_social_add_person);
+		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		//
+		sub.add("新浪微博").setIcon(R.drawable.logo_sinaweibo).setIntent(new Intent(this, OauthA.class).putExtra(QLayoutOauth.EXTRA_TYPE, QLayoutOauth.TYPE_SINA_WEIBO));
+		sub.add("腾讯微博").setIcon(R.drawable.logo_qqweibo);
+		sub.add("QQ空间").setIcon(R.drawable.logo_qqzone);
+		sub.add("人人网").setIcon(R.drawable.logo_renren);
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		QLog.log(item.getTitle().toString() + item.getItemId() + item.getGroupId());
+		return super.onOptionsItemSelected(item);
 	}
 	
 	private void refreshListToken(){
@@ -96,14 +121,14 @@ public class LoginA extends Activity implements OnClickListener {
 	}
 	
 	private void onClickOauth(int type){
-		switch(type){
+		/*switch(type){
 		case R.id.login_open_sina: type = OauthA.TYPE_SINA_WEIBO; break;
 		case R.id.login_open_qqweibo: type = OauthA.TYPE_QQ_WEIBO; break;
 		case R.id.login_open_qzone: type = OauthA.TYPE_QZONE; break;
 		case R.id.login_open_renren: type = OauthA.TYPE_RENREN; break;
 		}
 		startActivityForResult(new Intent(this, OauthA.class).putExtra(OauthA.EXTRA_TYPE, type), R.layout.login_open);
-		dialogOpen.dismiss();
+		dialogOpen.dismiss();*/
 	}
 	
 	private void onResultOauth(){

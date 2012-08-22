@@ -1,6 +1,6 @@
 package cn.xxd.tx.util;
 
-import q.util.a.view.QOauth.Token;
+import q.util.a.view.QLayoutOauth.Token;
 
 public class QConfig {
 

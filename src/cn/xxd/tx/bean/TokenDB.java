@@ -5,7 +5,7 @@ import java.util.List;
 
 import cn.xxd.tx.util.QSqlite;
 
-import q.util.a.view.QOauth;
+import q.util.a.view.QLayoutOauth;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -28,28 +28,28 @@ public class TokenDB  {
 	/**
 	* 构建ContentValues
 	*/
-	private ContentValues buildContentValues(QOauth.Token e){
+	private ContentValues buildContentValues(QLayoutOauth.Token e){
 		ContentValues cv = new ContentValues();
 		cv.put("type", e.getType());
 		cv.put("id", e.getId());
 		cv.put("token", e.getToken());
 		cv.put("expire", e.getExpireTime());
 		cv.put("name", e.getName());
-		cv.put("pic", e.getPic());
+		cv.put("pic", e.getPhoto());
 		return cv;
 	}
 	
 	/**
 	* 构建实体
 	*/
-	private QOauth.Token buildEntity(Cursor cs){
-		QOauth.Token e = new QOauth.Token();
-		e.setType(cs.getInt(0));
+	private QLayoutOauth.Token buildEntity(Cursor cs){
+		QLayoutOauth.Token e = new QLayoutOauth.Token();
+		e.setType(cs.getString(0));
 		e.setId(cs.getString(1));
 		e.setToken(cs.getString(2));
 		e.setExpireTime(cs.getLong(3));
 		e.setName(cs.getString(4));
-		e.setPic(cs.getString(5));
+		e.setPhoto(cs.getString(5));
 		return e;
 	}
 	
@@ -69,7 +69,7 @@ public class TokenDB  {
 	dbHelper.close();
 	}
 	
-	public void insert(QOauth.Token e) {
+	public void insert(QLayoutOauth.Token e) {
 	if(queryOne(e) == null){
 		db.insert("token", null, buildContentValues(e));
 	}else{
@@ -78,20 +78,20 @@ public class TokenDB  {
 	//db.execSQL("INSERT INTO "+DB_TABLE+"()
 	}
 	
-	public boolean update(QOauth.Token e) {
+	public boolean update(QLayoutOauth.Token e) {
 	return db.update("token", buildContentValues(e), "type=" + e.getType() + " AND id=" + e.getId(), null) > 0;
 	//db.execSQL("UPDATE "+DB_TABLE+" SET "+KEY_DATA+" = ? WHERE "+KEY_ID+" = ?", new Object[]{e.data, Integer.valueOf(e.id)})
 	}
 	
-	public boolean delete(QOauth.Token e) {
+	public boolean delete(QLayoutOauth.Token e) {
 	return db.delete("token", "type=" + e.getType() + " AND id=" + e.getId(), null) > 0;
 	//db.execSQL("DELETE FROM "+DB_TABLE+" WHERE "+KEY_ID+" = ?", new Object[]{Integer.valueOf(id)});
 	}
 	
-	public List<QOauth.Token> queryAll() {
+	public List<QLayoutOauth.Token> queryAll() {
 	//Cursor cs = db.query(DB_TABLE, new String[] { KEY_ID, KEY_DATA }, null, null, null, null, null);
 	Cursor cs = db.rawQuery("SELECT * FROM token", null);
-	List<QOauth.Token> es = new ArrayList<QOauth.Token>(cs.getCount());
+	List<QLayoutOauth.Token> es = new ArrayList<QLayoutOauth.Token>(cs.getCount());
 	int i = 0;
 	while(cs.moveToNext()){
 		es.add(buildEntity(cs));
@@ -99,7 +99,7 @@ public class TokenDB  {
 	return es;
 	}
 	
-	public QOauth.Token queryOne(QOauth.Token e) throws SQLException {
+	public QLayoutOauth.Token queryOne(QLayoutOauth.Token e) throws SQLException {
 	//Cursor cs = db.query(true, DB_TABLE, new String[] { KEY_ID, KEY_DATA }, KEY_ID + "=" + id, null, null, null,null, null);
 	Cursor cs = db.rawQuery("SELECT * FROM token WHERE type = ? AND id = ?", new String[]{String.valueOf(e.getType()), e.getId()});
 	if(cs.moveToNext()){

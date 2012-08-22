@@ -9,7 +9,7 @@ import java.util.Set;
 
 import cn.xxd.tx.bean.Friend;
 
-import q.util.QDisplay;
+import q.manager.QWindow;
 import q.util.a.QPinyin;
 
 import android.content.Context;
@@ -49,7 +49,7 @@ public class QListViewPinyin extends RelativeLayout implements OnTouchListener, 
 		//字母表
 		mygesture = new GestureDetector(this);// 构建手势探测器
 		layoutLetter = new LinearLayout(ctx);
-		RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(QDisplay.getWidth(ctx)/10, RelativeLayout.LayoutParams.FILL_PARENT);
+		RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(new QWindow(ctx).getWidth()/10, RelativeLayout.LayoutParams.FILL_PARENT);
 		rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		layoutLetter.setLayoutParams(rlp);
 		layoutLetter.setClickable(true);

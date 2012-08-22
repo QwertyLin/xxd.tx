@@ -6,7 +6,7 @@
     android:background="@color/bg"
     >
     
-    <include layout="@layout/layout_header_btn_right"/>
+    <!-- <include layout="@layout/layout_header_btn_right"/> -->
     
      <ListView 
         android:id="@+id/login_token"

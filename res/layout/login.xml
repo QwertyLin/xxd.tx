@@ -15,21 +15,4 @@
         android:layout_weight="1"
         ></ListView>
     
-    <ImageView 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/list_divider"
-        />
-    
-    <Button 
-        android:id="@+id/login_add"
-        android:layout_width="fill_parent"
-        android:layout_height="40dip"
-        android:background="@drawable/btn_blue"
-        android:layout_margin="5dip"
-        android:textSize="15sp"
-        android:textColor="#ffeeeeee"
-        android:text="添加"
-        />
-
 </LinearLayout>

@@ -8,6 +8,7 @@ import cn.xxd.tx.bean.Friend;
 
 import q.util.QFile;
 import q.util.QHttp;
+import q.util.QLog;
 import q.util.a.QPinyin;
 import q.util.a.QPinyin.Pinyin;
 import android.os.Bundle;
@@ -34,7 +35,6 @@ public class MainA extends Activity {
         setContentView(R.layout.main);
         //
         //new QDialog.Loading(this).show();
-        
         //
         QFile.init(this);
         //

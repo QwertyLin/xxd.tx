@@ -1,6 +1,5 @@
 package cn.xxd.tx.util;
 
-import cn.xxd.tx.bean.TokenDB;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -25,8 +24,7 @@ public class QSqlite extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		Log.i("QSqlite", "onCreate");
 		//可插入多个
-		db.execSQL(Demo.DB_CREATE);
-		db.execSQL(TokenDB.DB_CREATE);
+		//db.execSQL(Demo.DB_CREATE);
 	}
 
 	//数据库版本号DB_VERSION发生变化时调用

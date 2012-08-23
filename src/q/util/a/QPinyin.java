@@ -7,10 +7,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import q.util.QLog;
+
+import android.os.SystemClock;
+
 import net.sourceforge.pinyin4j.PinyinHelper;
 
 
 public class QPinyin<T extends QPinyin.IPinyin> {
+	
+	private boolean isWorking = false;
 	
 	private TreeSet<Pinyin> dataSet = new TreeSet<Pinyin>(new Comparator<Pinyin>() {
 		@Override
@@ -74,7 +80,11 @@ public class QPinyin<T extends QPinyin.IPinyin> {
 	}
 	
 	public synchronized void add(List<T> listTemp){
-		System.out.println("listTemp " + listTemp.size());
+		while(isWorking){
+			SystemClock.sleep(200);
+		}
+		isWorking = true;
+		//System.out.println("listTemp " + listTemp.size());
 		List<Pinyin> list = new ArrayList<Pinyin>();
 		Pinyin item = null;
 		for(T t : listTemp){
@@ -86,7 +96,7 @@ public class QPinyin<T extends QPinyin.IPinyin> {
 			String[] cs = PinyinHelper.toHanyuPinyinStringArray(t.getObj().getText().charAt(0));
     		if(cs != null){
     			t.setPinyin(PinyinHelper.toHanyuPinyinStringArray(t.getObj().getText().charAt(0))[0]);
-    			System.out.println(t.getPinyin());
+    			//System.out.println(t.getPinyin());
     			t.setTag(String.valueOf(Character.toUpperCase(t.getPinyin().charAt(0))));
     		}else{
     			if(Character.isLetter(t.getObj().getText().charAt(0))){ //区别字母还是数字或其他
@@ -97,10 +107,15 @@ public class QPinyin<T extends QPinyin.IPinyin> {
     		}
     		dataSet.add(t);
 		}
+		isWorking = false;
 	}
 	
-	public List<Pinyin> order(){
-		System.out.println("dataset " + dataSet.size());
+	public synchronized List<Pinyin> order(){
+		while(isWorking){
+			SystemClock.sleep(200);
+		}
+		isWorking = true;
+		//System.out.println("dataset " + dataSet.size());
 		Set<String> tagSet = new HashSet<String>();
 		Pinyin tag;
 		List<Pinyin> list = new ArrayList<Pinyin>();
@@ -112,7 +127,9 @@ public class QPinyin<T extends QPinyin.IPinyin> {
     		}
     		list.add(p);
     	}
+    	isWorking = false;
 		return list;
+		
 	}
 
 }

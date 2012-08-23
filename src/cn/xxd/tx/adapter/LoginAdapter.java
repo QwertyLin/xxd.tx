@@ -17,20 +17,22 @@ import android.widget.ListView;
 import android.widget.TextView;
 import cn.xxd.tx.FriendA;
 import cn.xxd.tx.R;
-import cn.xxd.tx.util.QConfig;
+import cn.xxd.tx.util.QApp;
 import q.frame.QDialog;
 import q.util.QFile;
 import q.util.QHttp;
-import q.util.a.view.QBaseAdapter;
-import q.util.a.view.QLayoutOauth;
+import q.util.a.QBitmapCache;
+import q.util.view.QBaseAdapter;
+import q.frame.layout.QLayoutOauth;
 
-public class TokenAdapter extends QBaseAdapter<QLayoutOauth.Token> implements OnClickListener {
+public class LoginAdapter extends QBaseAdapter<QLayoutOauth.Token> implements OnClickListener {
 	
+	QBitmapCache cache = new QBitmapCache();
 	QHttp qHttp;
 
-	public TokenAdapter(Context ctx, List<QLayoutOauth.Token> data, final ListView lv) {
+	public LoginAdapter(Context ctx, List<QLayoutOauth.Token> data, final ListView lv) {
 		super(ctx, data);
-		qHttp = new QHttp(10, QFile.get("login"), QConfig.CACHE_EXPIRE_PIC, new QHttp.CallbackBitmapList() {
+		qHttp = new QHttp(10, QFile.get("login"), ((QApp)ctx.getApplicationContext()).getCacheExpirePhoto(), new QHttp.CallbackBitmapList() {
 			
 			@Override
 			public void onError(IOException e) {
@@ -39,8 +41,9 @@ public class TokenAdapter extends QBaseAdapter<QLayoutOauth.Token> implements On
 			}
 			
 			@Override
-			public void onCompleted(Bitmap bm, int position) {
-				View v = lv.findViewWithTag(position);
+			public void onCompleted(Bitmap bm, String tag) {
+				cache.put(tag, bm);
+				View v = lv.findViewWithTag(tag);
 				if(v != null){
 					((ImageView)v).setImageBitmap(bm);
 				}
@@ -68,7 +71,7 @@ public class TokenAdapter extends QBaseAdapter<QLayoutOauth.Token> implements On
 	protected void onInitItem(int position, final QLayoutOauth.Token data, Object viewHolder) {
 		Holder h = (Holder)viewHolder;
 		//
-		h.ivPic.setTag(position);
+		h.ivPic.setTag(data.getId());
 		//
 		/*switch(data.getType()){
 		case QLayoutOauth.TYPE_SINA_WEIBO: h.ivLogo.setBackgroundResource(R.drawable.logo_sinaweibo); break;
@@ -84,7 +87,14 @@ public class TokenAdapter extends QBaseAdapter<QLayoutOauth.Token> implements On
 		//
 		h.btnDelete.setTag(data);
 		h.btnDelete.setOnClickListener(this);
-		qHttp.get(data.getPhoto(), position);
+		
+		Bitmap bm = cache.get(data.getId());
+		if(bm != null){
+			h.ivPic.setImageBitmap(bm);
+		}else{
+			h.ivPic.setImageBitmap(null);
+			qHttp.get(data.getPhoto(), data.getId());
+		}
 	}
 	
 	class Holder {
@@ -108,7 +118,7 @@ public class TokenAdapter extends QBaseAdapter<QLayoutOauth.Token> implements On
 	}
 	
 	private void onClickItem(QLayoutOauth.Token data){
-		QConfig.TOKEN = data;
+		((QApp)ctx.getApplicationContext()).setToken(data);
 		ctx.startActivity(new Intent(ctx, FriendA.class));
 	}
 	

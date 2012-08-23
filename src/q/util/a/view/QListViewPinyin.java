@@ -11,6 +11,7 @@ import cn.xxd.tx.bean.Friend;
 
 import q.manager.QWindow;
 import q.util.a.QPinyin;
+import q.util.view.QBaseAdapter;
 
 import android.content.Context;
 import android.util.Log;

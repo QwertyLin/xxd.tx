@@ -9,25 +9,25 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import cn.xxd.tx.FriendA;
 import cn.xxd.tx.R;
 import cn.xxd.tx.bean.Friend;
-import cn.xxd.tx.util.QConfig;
+import cn.xxd.tx.util.QApp;
 import q.util.QHttp;
+import q.util.QLog;
 import q.util.a.QBitmapCache;
 import q.util.a.QPinyin;
 import q.util.a.view.QListViewPinyin;
 
 public class FriendAdapter extends QListViewPinyin.Adapter<QPinyin<Friend>.Pinyin>{
 	
-	Handler handler;
 	QBitmapCache cache = new QBitmapCache();
 	QHttp qhttp;
 	ListView lv;
 
-	public FriendAdapter(final Context ctx, List<QPinyin<Friend>.Pinyin> data, Handler handler, String cacheDir) {
+	public FriendAdapter(final Context ctx, List<QPinyin<Friend>.Pinyin> data, String cacheDir) {
 		super(ctx, data);
-		this.handler = handler;
-		qhttp = new QHttp(10, cacheDir, QConfig.CACHE_EXPIRE_PIC, new QHttp.CallbackBitmapList() {
+		qhttp = new QHttp(10, cacheDir, ((QApp)ctx.getApplicationContext()).getCacheExpirePhoto(), new QHttp.CallbackBitmapList() {
 			
 			@Override
 			public void onError(IOException e) {
@@ -36,12 +36,12 @@ public class FriendAdapter extends QListViewPinyin.Adapter<QPinyin<Friend>.Pinyi
 			}
 			
 			@Override
-			public void onCompleted(final Bitmap bm, final int tag) {
+			public void onCompleted(final Bitmap bm, final String tag) {
+				cache.put(tag, bm);
 				View v = lv.findViewWithTag(tag);
 				if(v != null){
 					((ImageView)v).setImageBitmap(bm);
 				}
-				cache.put(String.valueOf(tag), bm);
 			}
 		});
 		qhttp.setCheckConnContentLength(true);
@@ -75,20 +75,20 @@ public class FriendAdapter extends QListViewPinyin.Adapter<QPinyin<Friend>.Pinyi
 		if(data.isTag()){
 			h.layoutItem.setVisibility(View.GONE);
 			h.layoutTag.setVisibility(View.VISIBLE);
-			h.tvTag.setText(String.valueOf(data.getTag()));
+			h.tvTag.setText(data.getTag());
 		}else{
-			h.ivPic.setTag(position);
+			h.ivPic.setTag(f.getId());
 			h.layoutTag.setVisibility(View.GONE);
 			h.layoutItem.setVisibility(View.VISIBLE);
 			h.tvName.setText(f.getName());
 			h.tvRemark.setText(f.getRemark());
 			
-			Bitmap bm = cache.get(String.valueOf(position));
+			Bitmap bm = cache.get(f.getId());
 			if(bm != null){
 				h.ivPic.setImageBitmap(bm);
 			}else{
 				h.ivPic.setImageBitmap(null);
-				qhttp.get(f.getPic(), position);
+				qhttp.get(f.getPic(), f.getId());
 			}
 			
 		}

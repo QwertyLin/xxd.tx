@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" 
-    android:background="@color/bg"
+    android:id="@+id/layout"
     >
     
    <!--  <include layout="@layout/layout_header_btn_right"/> -->
     
-    <LinearLayout 
+    <!-- <LinearLayout 
 	    android:id="@+id/title"
 	    android:layout_width="fill_parent"
 	    android:layout_height="@dimen/title_height"
@@ -28,9 +28,9 @@
 		    android:layout_height="wrap_content"
 		    android:text="下载"
 		    />
-	</LinearLayout>
+	</LinearLayout> -->
 	
-	<LinearLayout 
+	<!-- <LinearLayout 
 	    android:layout_width="fill_parent"
 	    android:layout_height="@dimen/title_height"
 	    android:orientation="horizontal"
@@ -49,18 +49,26 @@
 	        android:layout_height="wrap_content"
 	        android:text="正在下载好友列表"
 	        />
-	</LinearLayout>
+	</LinearLayout> -->
 	
 	<FrameLayout 
 	    android:id="@+id/friend_layout_lv"
 	    android:layout_width="fill_parent"
-	    android:layout_height="0dip"
-	    android:layout_weight="1"
+	    android:layout_height="fill_parent"
 	    >
 	</FrameLayout>
+	
+	<ProgressBar 
+	    android:id="@+id/friend_pb"
+	    style="?android:attr/progressBarStyleHorizontal"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:layout_centerHorizontal="true"
+	    android:layout_marginLeft="40dip"
+	    android:layout_marginRight="40dip"
+	    android:layout_marginBottom="30dip"
+	    android:visibility="gone"
+	    />
     
-	
-	
-	
-	
-</LinearLayout>
+</RelativeLayout>

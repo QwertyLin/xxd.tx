@@ -25,9 +25,9 @@ public class FriendAdapter extends QListViewPinyin.Adapter<QPinyin<Friend>.Pinyi
 	QHttp qhttp;
 	ListView lv;
 
-	public FriendAdapter(final Context ctx, List<QPinyin<Friend>.Pinyin> data, String cacheDir) {
+	public FriendAdapter(final Context ctx, List<QPinyin<Friend>.Pinyin> data) {
 		super(ctx, data);
-		qhttp = new QHttp(10, cacheDir, ((QApp)ctx.getApplicationContext()).getCacheExpirePhoto(), new QHttp.CallbackBitmapList() {
+		qhttp = new QHttp(ctx, 10, ((QApp)ctx.getApplicationContext()).getCacheExpirePhoto(), new QHttp.CallbackBitmapList() {
 			
 			@Override
 			public void onError(IOException e) {
@@ -88,7 +88,7 @@ public class FriendAdapter extends QListViewPinyin.Adapter<QPinyin<Friend>.Pinyi
 				h.ivPic.setImageBitmap(bm);
 			}else{
 				h.ivPic.setImageBitmap(null);
-				qhttp.get(f.getPic(), f.getId());
+				qhttp.get(f.getPhoto(), f.getId());
 			}
 			
 		}

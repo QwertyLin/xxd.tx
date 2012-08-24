@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import cn.xxd.tx.FriendA;
+import cn.xxd.tx.MainA;
 import cn.xxd.tx.R;
 import cn.xxd.tx.util.QApp;
 import q.frame.QDialog;
@@ -29,10 +30,12 @@ public class LoginAdapter extends QBaseAdapter<QLayoutOauth.Token> implements On
 	
 	QBitmapCache cache = new QBitmapCache();
 	QHttp qHttp;
+	boolean isFromOut;
 
-	public LoginAdapter(Context ctx, List<QLayoutOauth.Token> data, final ListView lv) {
+	public LoginAdapter(Context ctx, List<QLayoutOauth.Token> data, final ListView lv, boolean isFromOut) {
 		super(ctx, data);
-		qHttp = new QHttp(10, QFile.get("login"), ((QApp)ctx.getApplicationContext()).getCacheExpirePhoto(), new QHttp.CallbackBitmapList() {
+		this.isFromOut = isFromOut;
+		qHttp = new QHttp(ctx, 10, ((QApp)ctx.getApplicationContext()).getCacheExpirePhoto(), new QHttp.CallbackBitmapList() {
 			
 			@Override
 			public void onError(IOException e) {
@@ -119,7 +122,11 @@ public class LoginAdapter extends QBaseAdapter<QLayoutOauth.Token> implements On
 	
 	private void onClickItem(QLayoutOauth.Token data){
 		((QApp)ctx.getApplicationContext()).setToken(data);
-		ctx.startActivity(new Intent(ctx, FriendA.class));
+		if(isFromOut){
+			ctx.startActivity(new Intent(ctx, FriendA.class).putExtra(MainA.EXTRA_FORM_OUT, true));
+		}else{
+			ctx.startActivity(new Intent(ctx, FriendA.class));
+		}
 	}
 	
 	private void onClickDelete(QLayoutOauth.Token data){

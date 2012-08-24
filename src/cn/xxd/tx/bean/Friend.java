@@ -6,13 +6,24 @@ public class Friend implements IPinyin {
 
 	private String 
 		id,
-		name, //screen_name
-		remark, //remark 备注
-		pic; //avatar_large 头像
+		name, //
+		remark, //备注
+		photo, //头像
+	    photoBig; //大头像
 	
 	@Override
 	public String getText() {
 		return name;
+	}
+	
+	public Friend clone() {
+		Friend item = new Friend();
+		item.id = this.id;
+		item.name = this.name;
+		item.remark = this.remark;
+		item.photo = this.photo;
+		item.photoBig = this.photoBig;
+		return item;
 	}
 	
 	public String getId() {
@@ -39,12 +50,20 @@ public class Friend implements IPinyin {
 		this.remark = remark;
 	}
 
-	public String getPic() {
-		return pic;
+	public String getPhoto() {
+		return photo;
 	}
 
-	public void setPic(String pic) {
-		this.pic = pic;
+	public void setPhoto(String photo) {
+		this.photo = photo;
+	}
+
+	public String getPhotoBig() {
+		return photoBig;
+	}
+
+	public void setPhotoBig(String photoBig) {
+		this.photoBig = photoBig;
 	}
 
 }

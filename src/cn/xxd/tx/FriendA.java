@@ -2,6 +2,8 @@ package cn.xxd.tx;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,8 +41,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
@@ -53,110 +57,40 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import api.QQWeiboParser;
 import api.SinaParser;
 
 //先比较本地版本，
 
-public class FriendA extends QActivity implements OnClickListener, OnItemClickListener {
+public class FriendA extends QActivity implements OnClickListener, OnItemClickListener, OnCheckedChangeListener {
 				
 	private int friendPageCount, friendPageCountTemp, friendCount, friendCountTemp;
 	private QPinyin<Friend> qPinyin;
 	private QHttp qhttp, qhttp2;
-	private String cacheDir;
 	private QLayoutOauth.Token token;
+	private boolean isByName = true; //true为按name排序，false为按remark排序
+	private QApp qApp;
+	private boolean isFromOut;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		qApp = (QApp)getApplicationContext();
+		isFromOut = getIntent().getBooleanExtra(MainA.EXTRA_FORM_OUT, false);
+		//
+		if(isFromOut){
+			qApp.getQActivityCache().put(this);
+		}
+		//
+		token = ((QApp)getApplicationContext()).getToken();
+		//
+		//
 		getSupportActionBar().hide();
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSupportActionBar().setDisplayShowCustomEnabled(true);
 		//
 		RadioGroup rg = (RadioGroup)getLayoutInflater().inflate(R.layout.friend_order, null);
-		rg.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				switch(checkedId){
-				case R.id.friend_order_name:
-					qList.setVisibility(View.INVISIBLE);
-					new Thread(){
-						public void run() {
-							QPinyin<Friend> qPinyin = new QPinyin<Friend>();
-							String temp;
-							Friend tempFriend;
-							List<Friend> newDatas = new ArrayList<Friend>();
-							for(QPinyin<Friend>.Pinyin item : datas){
-								tempFriend = item.getObj();
-								if(tempFriend != null){
-									if(tempFriend.getRemark() != null && !tempFriend.getRemark().equals("")){
-										temp = tempFriend.getName();
-										tempFriend.setName(tempFriend.getRemark());
-										tempFriend.setRemark(temp);
-									}
-									newDatas.add(tempFriend);
-								}
-							}
-							qPinyin.add(newDatas);
-							final List<QPinyin<Friend>.Pinyin> list = qPinyin.order();
-							runOnUiThread(new Runnable() {
-								
-								@Override
-								public void run() {
-									datas.clear();
-									datas.addAll(list);
-									qList.setVisibility(View.VISIBLE);
-									qList.refreshLetter();
-									qList.getListView().smoothScrollToPosition(0);
-									adapter.notifyDataSetChanged();
-								}
-							});
-						};
-					}.start();
-					break;
-				case R.id.friend_order_remark:
-					if(datasTemp != null){
-						
-					}else{
-						qList.setVisibility(View.INVISIBLE);
-						new Thread(){
-							public void run() {
-								QPinyin<Friend> qPinyin = new QPinyin<Friend>();
-								String temp;
-								Friend tempFriend;
-								List<Friend> newDatas = new ArrayList<Friend>();
-								for(QPinyin<Friend>.Pinyin item : datas){
-									tempFriend = item.getObj();
-									if(tempFriend != null){
-										if(tempFriend.getRemark() != null && !tempFriend.getRemark().equals("")){
-											temp = tempFriend.getName();
-											tempFriend.setName(tempFriend.getRemark());
-											tempFriend.setRemark(temp);
-										}
-										newDatas.add(tempFriend);
-									}
-								}
-								qPinyin.add(newDatas);
-								final List<QPinyin<Friend>.Pinyin> list = qPinyin.order();
-								runOnUiThread(new Runnable() {
-									
-									@Override
-									public void run() {
-										datas.clear();
-										datas.addAll(list);
-										qList.setVisibility(View.VISIBLE);
-										qList.refreshLetter();
-										qList.getListView().smoothScrollToPosition(0);
-										adapter.notifyDataSetChanged();
-									}
-								});
-							};
-						}.start();
-					}
-					break;
-				}
-			}
-		});
+		rg.setOnCheckedChangeListener(this);
 		//
 		getSupportActionBar().setCustomView(rg);
 		//
@@ -165,12 +99,9 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 		pb = (ProgressBar)findViewById(R.id.friend_pb);
 		((RelativeLayout)findViewById(R.id.layout)).addView(new QLayout.Loading(this, "加载中"), 0);
 		
-		token = ((QApp)getApplicationContext()).getToken();
-		
-		cacheDir = QFile.get(token.getType() + "_" + token.getId());
 		//
 		QLog.log(token.getType() + "_" + token.getId());
-		qhttp = new QHttp(0, cacheDir, 60 * 24 * 30, new QHttp.CallbackString() {
+		qhttp = new QHttp(this, 0, 60 * 24 * 30, new QHttp.CallbackString() {
 			
 			@Override
 			public void onError(IOException e) {
@@ -181,14 +112,21 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 			@Override
 			public void onCompleted(String obj) {
 				try {
-					onGetCountSuccess(SinaParser.usersShowFriendsCount(obj));
+					switch(token.getType()){
+					case QLayoutOauth.TYPE_SINA_WEIBO:
+						onGetCountSuccess(SinaParser.usersShowFriendsCount(obj));
+						break;
+					case QLayoutOauth.TYPE_QQ_WEIBO:
+						onGetCountSuccess(QQWeiboParser.usersShowFriendsCount(obj));
+						break;
+					}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		});
-		qhttp2 = new QHttp(5, cacheDir, 60 * 24 * 30, new QHttp.CallbackString() {
+		qhttp2 = new QHttp(this, 5, 60 * 24 * 30, new QHttp.CallbackString() {
 			
 			@Override
 			public void onError(IOException e) {
@@ -198,9 +136,16 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 			
 			@Override
 			public void onCompleted(String obj) {
-				List<Friend> data;
+				List<Friend> data = null;
 				try {
-					data = SinaParser.friendshipsFriends((String)obj);
+					switch(token.getType()){
+					case QLayoutOauth.TYPE_SINA_WEIBO:
+						data = SinaParser.friendshipsFriends((String)obj, !isByName);
+						break;
+					case QLayoutOauth.TYPE_QQ_WEIBO:
+						data = QQWeiboParser.friendshipsFriends((String)obj);
+						break;
+					}
 					onGetIndexSuccess(data);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -215,7 +160,7 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 		
 		//
 		datas = new ArrayList<QPinyin<Friend>.Pinyin>();
-		adapter = new FriendAdapter(this, datas, cacheDir);
+		adapter = new FriendAdapter(this, datas);
 		qList = new QListViewPinyin(this, adapter);
 		qList.setBackgroundColor(0xFFFFFFFF);
 		adapter.setListView(qList.getListView());
@@ -236,7 +181,6 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 		}.start();
 	}
 	
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menuRefresh = menu.add("刷新");
@@ -255,21 +199,78 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		final Dialog d = new Dialog(this);
-		d.setContentView(R.layout.photo);
-		/*qhttp.getBitmap(datas.get(position).getObj().getPic().replace("/50/", "/180/"), new Handler(){
-			@Override
-			public void handleMessage(Message msg) {
-				switch(msg.what){
-				case 0:
-					((ImageView)d.findViewById(R.id.photo_pic)).setImageBitmap((Bitmap)msg.obj);
-					break;
-				}
-				super.handleMessage(msg);
+		if(isFromOut){
+			startActivity(new Intent(this, PhotoA.class).putExtra(PhotoA.EXTRA_IMG, datas.get(position).getObj().getPhotoBig()).putExtra(MainA.EXTRA_FORM_OUT, true));
+		}else{
+			startActivity(new Intent(this, PhotoA.class).putExtra(PhotoA.EXTRA_IMG, datas.get(position).getObj().getPhotoBig()));
+		}
+	}
+	
+	@Override
+	public void onCheckedChanged(RadioGroup rg, int checkedId) {
+		boolean isSelectNameTemp = false;
+		switch(checkedId){
+		case R.id.friend_order_name:
+			isSelectNameTemp = true;
+			break;
+		case R.id.friend_order_remark:
+			isSelectNameTemp = false;
+			break;
+		}
+		final boolean isSelectName = isSelectNameTemp;
+		if( (isSelectName && datasByName != null) || (!isSelectName && datasByRemark != null)){
+			datas.clear();
+			if(isSelectName){
+				datas.addAll(datasByName);
+			}else{
+				datas.addAll(datasByRemark);
 			}
-		});*/
-		d.show();
-		//startActivityForResult(new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI), 0);
+			qList.refreshLetter();
+			qList.getListView().scrollTo(0, 0);
+			adapter.notifyDataSetChanged();
+		} else {
+			qList.setVisibility(View.INVISIBLE);
+			new Thread(){
+				public void run() {
+					QPinyin<Friend> qPinyin = new QPinyin<Friend>();
+					Friend oldFriend;
+					Friend newFriend;
+					List<Friend> newDatas = new ArrayList<Friend>();
+					for(QPinyin<Friend>.Pinyin item : datas){
+						oldFriend = item.getObj();
+						if(oldFriend != null){
+							newFriend = oldFriend.clone();
+							if(oldFriend.getRemark() != null && !oldFriend.getRemark().equals("")){
+								newFriend.setName(oldFriend.getRemark());
+								newFriend.setRemark(oldFriend.getName());
+							}
+							newDatas.add(newFriend);
+						}
+					}
+					qPinyin.add(newDatas);
+					if(isSelectName){
+						datasByName = qPinyin.order();
+					}else{
+						datasByRemark = qPinyin.order();
+					}
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							datas.clear();
+							if(isSelectName){
+								datas.addAll(datasByName);
+							}else{
+								datas.addAll(datasByRemark);
+							}
+							qList.setVisibility(View.VISIBLE);
+							qList.refreshLetter();
+							qList.getListView().scrollTo(0, 0);
+							adapter.notifyDataSetChanged();
+						}
+					});
+				};
+			}.start();
+		}
 	}
 	
 	@Override
@@ -334,7 +335,8 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 		getSupportActionBar().hide();
 		qPinyin = new QPinyin<Friend>();
 		datas.clear();
-		datasTemp = null;
+		datasByName = null;
+		datasByRemark = null;
 		adapter.notifyDataSetChanged();
 		friendPageCountTemp = 0;
 		onGetCount();
@@ -342,7 +344,14 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 	
 	private void onGetCount(){
 		QLog.log("onGetCount");
-		qhttp.get(QLayoutOauth.HandleSinaWeibo.urlUsersShow(token));
+		switch(token.getType()){
+		case QLayoutOauth.TYPE_SINA_WEIBO:
+			qhttp.get(QLayoutOauth.HandleSinaWeibo.urlUsersShow(token));
+			break;
+		case QLayoutOauth.TYPE_QQ_WEIBO:
+			qhttp.get(QLayoutOauth.HandleQQWeibo.urlUserInfoSimple(token, token.getId()));
+			break;
+		}
 	}
 	
 	private void onGetCountSuccess(int friendsCount){
@@ -362,7 +371,15 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 		QLog.log("onGetIndex 线程需求：" + friendPageCount);
 		for(int i = 0; i < friendPageCount; i++){
 			try {
-				qhttp2.get(QLayoutOauth.HandleSinaWeibo.urlFriends(token, 50, i * 50));
+				switch(token.getType()){
+				case QLayoutOauth.TYPE_SINA_WEIBO:
+					qhttp2.get(QLayoutOauth.HandleSinaWeibo.urlFriends(token, 50, i * 50));
+					break;
+				case QLayoutOauth.TYPE_QQ_WEIBO:
+					qhttp2.get(QLayoutOauth.HandleQQWeibo.urlFriendsIdolistSimple(token, 50, i * 50));
+					break;
+				}
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -398,6 +415,14 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 								qhttp2.setCacheExpire(0L);
 							}
 							getSupportActionBar().show();
+							//
+							if(isByName){
+								datasByName = new ArrayList<QPinyin<Friend>.Pinyin>();
+								datasByName.addAll(datas);
+							}else{
+								datasByRemark = new ArrayList<QPinyin<Friend>.Pinyin>();
+								datasByRemark.addAll(datas);
+							}
 						}
 					}
 				});
@@ -409,10 +434,12 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 		
 	private ProgressBar pb;
 	private List<QPinyin<Friend>.Pinyin> datas; //当其中一个按name排序时，另一个就按remark排序
-	private List<QPinyin<Friend>.Pinyin> datasTemp;
+	private List<QPinyin<Friend>.Pinyin> datasByName, datasByRemark;
 	private QListViewPinyin qList;
 	private FriendAdapter adapter;
 	private MenuItem menuRefresh;
+
+	
 	
 	
 	

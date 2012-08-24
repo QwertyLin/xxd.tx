@@ -9,7 +9,9 @@ public class QApp extends q.util.QApp {
 		super.onCreate();
 	}
 	
-	private QLayoutOauth.Token token; //操作中的Token
+	//操作中的Token
+	
+	private QLayoutOauth.Token token; 
 
 	public QLayoutOauth.Token getToken() {
 		return token;
@@ -19,11 +21,15 @@ public class QApp extends q.util.QApp {
 		this.token = token;
 	}
 	
-	private int cacheExpirePhoto = 60 * 24 * 30 * 3;  //头像图片缓存时间 3个月
+	//头像图片缓存时间 3个月
+	
+	private int cacheExpirePhoto = 60 * 24 * 30 * 3;  
 
 	public int getCacheExpirePhoto() {
 		return cacheExpirePhoto;
 	}
+	
+	
 	
 	
 }

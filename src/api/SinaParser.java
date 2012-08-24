@@ -16,7 +16,7 @@ public class SinaParser {
 		return new JSONObject(jsonStr).getInt("friends_count");
 	}
 
-	public static final List<Friend> friendshipsFriends(String jsonStr) throws JSONException{
+	public static final List<Friend> friendshipsFriends(String jsonStr, boolean isSwitchNameAndRemark) throws JSONException{
 		List<Friend> data = new ArrayList<Friend>();
 		JSONObject jo = new JSONObject(jsonStr);
 		JSONArray ja = jo.getJSONArray("users");
@@ -26,9 +26,15 @@ public class SinaParser {
 			j = ja.getJSONObject(i);
 			f = new Friend();
 			f.setId(j.getString("id"));
-			f.setName(j.getString("screen_name"));
-			f.setRemark(j.getString("remark"));
-			f.setPic("http://tp1.sinaimg.cn/" + f.getId() + "/50/0/1");
+			if(isSwitchNameAndRemark && !"".equals(j.getString("remark"))){
+				f.setName(j.getString("remark"));
+				f.setRemark(j.getString("screen_name"));
+			}else{
+				f.setName(j.getString("screen_name"));
+				f.setRemark(j.getString("remark"));
+			}
+			f.setPhoto("http://tp1.sinaimg.cn/" + f.getId() + "/50/0/1");
+			f.setPhotoBig("http://tp1.sinaimg.cn/" + f.getId() + "/180/0/1");
 			data.add(f);
 		}
 		return data;

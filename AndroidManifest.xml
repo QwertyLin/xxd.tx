@@ -29,10 +29,7 @@
         <meta-data android:value="5032f18952701507b4000021" android:name="UMENG_APPKEY"></meta-data>
 		<meta-data android:value="Test" android:name="UMENG_CHANNEL"/>
         
-        <activity
-            android:name=".MainA"
-            android:theme="@android:style/Theme.Light.NoTitleBar"
-            >
+        <activity  android:name=".MainA">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -5,4 +5,8 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">MainA</string>
 
+    <string name="dialog_confirm">确定</string>
+    <string name="dialog_cancel">取消</string>
+    
+    <string name="photo_dialog_success_arrow">》》》</string>
 </resources>

@@ -6,11 +6,11 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
 
-import q.frame.QActivity;
 import q.util.QLog;
 import q.util.a.view.QListView;
 import q.frame.layout.QLayoutOauth;
 import cn.xxd.tx.adapter.LoginAdapter;
+import cn.xxd.tx.util.QActivity;
 import cn.xxd.tx.util.QApp;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,23 +26,20 @@ public class LoginA extends QActivity implements OnClickListener {
 	LoginAdapter adapter;
 	ListView lv;
 	
-	private QApp qApp;
-	private boolean isFromOut;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		qApp = (QApp)getApplicationContext();
 		//
-		isFromOut = getIntent().getBooleanExtra(MainA.EXTRA_FORM_OUT, false);
-		if(isFromOut){
-			qApp.getQActivityCache().put(this);
+		if(getQApp().isFromOut()){
+			getQApp().getQActivityCache().put(this);
 		}
 		//
 		setContentView(R.layout.login);
 		//
 		lv = (ListView)findViewById(R.id.login_token);
 		QListView.init(this, lv);
+		
 		//
 	}
 	
@@ -53,7 +50,7 @@ public class LoginA extends QActivity implements OnClickListener {
 		db.open(false);
 		if(listToken == null){
 			listToken = db.queryAll();
-			adapter = new LoginAdapter(this, listToken, lv, isFromOut);
+			adapter = new LoginAdapter(this, listToken, lv);
 			lv.setAdapter(adapter);
 		}else{
 			listToken.clear();

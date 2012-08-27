@@ -1,7 +1,7 @@
 package cn.xxd.tx;
 
+import cn.xxd.tx.util.QActivity;
 import android.os.Bundle;
-import q.frame.QActivity;
 import q.frame.QDialog;
 import q.util.QLog;
 import q.frame.layout.QLayoutOauth;

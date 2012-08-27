@@ -6,7 +6,10 @@ import java.io.IOException;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
+import cn.xxd.tx.util.QActivity;
 import cn.xxd.tx.util.QApp;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -20,8 +23,8 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
-import q.frame.QActivity;
 import q.frame.QLayout;
 import q.util.QBitmap;
 import q.util.QContact;
@@ -33,26 +36,18 @@ public class PhotoA extends QActivity {
 	public static String EXTRA_IMG = "img";
 	private String filePath;
 	private Bitmap bm;
-	private QApp qApp;
-	private boolean isFromOut;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		qApp = (QApp)getApplicationContext();
-		isFromOut = getIntent().getBooleanExtra(MainA.EXTRA_FORM_OUT, false);
-		if(isFromOut){
-			qApp.getQActivityCache().put(this);
-		}
 		//
-		
 		//
 		filePath = getIntent().getStringExtra(EXTRA_IMG);
 		//
 		setContentView(R.layout.friend_photo);
 		 ((RelativeLayout)findViewById(R.id.layout)).addView(new QLayout.Loading(this, "加载中"), 0);
 		
-		new QHttp(this, 0, qApp.getCacheExpirePhoto(), new QHttp.CallbackBitmap() {
+		new QHttp(this, 0, getQApp().getCacheExpirePhoto(), new QHttp.CallbackBitmap() {
 			
 			@Override
 			public void onError(IOException e) {
@@ -71,13 +66,13 @@ public class PhotoA extends QActivity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if(isFromOut){
+		if(getQApp().isFromOut()){
 			menu.add(0, 1, 0, "确定")
 	    	.setIcon(R.drawable.a_content_save)
 	        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		}else{
 			menu.add(0, 1, 0, "设置为通讯录头像")
-	        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		}
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -95,10 +90,12 @@ public class PhotoA extends QActivity {
 	private void onSelectSave(){
 		String file = new QHttp(this, 0, 0, null).getFilePath(filePath);
 		QLog.log(file);
-		if(isFromOut){
+		if(getQApp().isFromOut()){
 			finish();
-			qApp.getQActivityCache().get(0).setResult(RESULT_OK, new Intent().setData(Uri.parse("file://" + file)));
-			qApp.getQActivityCache().clear();
+			QLog.log(getQApp().getQActivityCache().get(0).getClass().getName());
+			getQApp().getQActivityCache().get(0).setResult(RESULT_OK, new Intent().setData(Uri.parse("file://" + file)));
+			getQApp().getQActivityCache().clear();
+			getQApp().setFromOut(false);//只要点击了设置，就还原，以免中途退出时影响下次使用
 		}else{
 			Intent intent = new Intent();
 	        intent.setAction(Intent.ACTION_PICK);
@@ -108,18 +105,33 @@ public class PhotoA extends QActivity {
 	}
 	
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RESULT_OK) {
-
             if (data == null) {
                 return;
             }    
-            Uri result = data.getData();
-            String contactId = result.getLastPathSegment();
-            String contactName = getPhoneContacts(contactId);
-           	QLog.log(contactId + " " + contactName);
-           	QContact.updatePhoto(this, Long.parseLong(contactId), QBitmap.toByte(bm));
+            
+           	//
+           	View v = getLayoutInflater().inflate(R.layout.photo_save, null);
+           	((ImageView)v.findViewById(R.id.photo_save_new)).setImageBitmap(bm);
+           	((ImageView)v.findViewById(R.id.photo_save_old)).setImageBitmap(bm);
+           	new AlertDialog.Builder(this)
+           	.setView(v)
+           	.setMessage("确定设置为<>的头像吗？")
+           	.setPositiveButton(R.string.dialog_confirm, new DialogInterface.OnClickListener(){
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Uri result = data.getData();
+		            String contactId = result.getLastPathSegment();
+		            String contactName = getPhoneContacts(contactId);
+		           	QLog.log(contactId + " " + contactName);
+		           	QContact.updatePhoto(PhotoA.this, Long.parseLong(contactId), QBitmap.toByte(bm));
+		           	finish();
+				}
+           	})
+           	.setNegativeButton(R.string.dialog_cancel, null)
+           	.show();
         }
 	}
 	

@@ -1,8 +1,9 @@
 package cn.xxd.tx.util;
 
 import q.frame.layout.QLayoutOauth;
+import q.util.QAppSp;
 
-public class QApp extends q.util.QApp {
+public class QApp extends QAppSp {
 
 	@Override
 	public void onCreate() {
@@ -27,6 +28,18 @@ public class QApp extends q.util.QApp {
 
 	public int getCacheExpirePhoto() {
 		return cacheExpirePhoto;
+	}
+	
+	//是否从相册等其他地方进入
+	
+	private boolean isFromOut;
+
+	public boolean isFromOut() {
+		return isFromOut;
+	}
+
+	public void setFromOut(boolean isFromOut) {
+		this.isFromOut = isFromOut;
 	}
 	
 	

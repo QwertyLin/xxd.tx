@@ -14,9 +14,9 @@ import com.actionbarsherlock.view.MenuItem;
 
 import cn.xxd.tx.adapter.FriendAdapter;
 import cn.xxd.tx.bean.Friend;
+import cn.xxd.tx.util.QActivity;
 import cn.xxd.tx.util.QApp;
 
-import q.frame.QActivity;
 import q.frame.QDialog;
 import q.frame.QLayout;
 import q.util.QFile;
@@ -69,20 +69,18 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 	private QHttp qhttp, qhttp2;
 	private QLayoutOauth.Token token;
 	private boolean isByName = true; //true为按name排序，false为按remark排序
-	private QApp qApp;
-	private boolean isFromOut;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		qApp = (QApp)getApplicationContext();
-		isFromOut = getIntent().getBooleanExtra(MainA.EXTRA_FORM_OUT, false);
 		//
-		if(isFromOut){
-			qApp.getQActivityCache().put(this);
+		if(getQApp().isFromOut()){
+			getQApp().getQActivityCache().put(this);
 		}
 		//
-		token = ((QApp)getApplicationContext()).getToken();
+		//
+		//
+		token = getQApp().getToken();
 		//
 		//
 		getSupportActionBar().hide();
@@ -199,11 +197,7 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		if(isFromOut){
-			startActivity(new Intent(this, PhotoA.class).putExtra(PhotoA.EXTRA_IMG, datas.get(position).getObj().getPhotoBig()).putExtra(MainA.EXTRA_FORM_OUT, true));
-		}else{
-			startActivity(new Intent(this, PhotoA.class).putExtra(PhotoA.EXTRA_IMG, datas.get(position).getObj().getPhotoBig()));
-		}
+		startActivity(new Intent(this, PhotoA.class).putExtra(PhotoA.EXTRA_IMG, datas.get(position).getObj().getPhotoBig()));
 	}
 	
 	@Override

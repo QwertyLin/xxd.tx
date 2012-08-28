@@ -62,6 +62,8 @@ public class LoginA extends QActivity implements OnClickListener {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add("设置").setIcon(R.drawable.a_action_settings).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		//
 		SubMenu sub = menu.addSubMenu("绑定帐号");
 		MenuItem item = sub.getItem();
 		item.setIcon(R.drawable.a_social_add_person);

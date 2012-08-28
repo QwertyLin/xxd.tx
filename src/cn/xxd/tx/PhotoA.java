@@ -47,6 +47,11 @@ public class PhotoA extends QActivity {
 		setContentView(R.layout.friend_photo);
 		 ((RelativeLayout)findViewById(R.id.layout)).addView(new QLayout.Loading(this, "加载中"), 0);
 		
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
 		new QHttp(this, 0, getQApp().getCacheExpirePhoto(), new QHttp.CallbackBitmap() {
 			
 			@Override

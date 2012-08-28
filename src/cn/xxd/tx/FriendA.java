@@ -78,13 +78,11 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 			getQApp().getQActivityCache().put(this);
 		}
 		//
+		getSupportActionBar().setTitle("好友列表");
 		//
 		//
 		token = getQApp().getToken();
 		//
-		//
-		getSupportActionBar().hide();
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSupportActionBar().setDisplayShowCustomEnabled(true);
 		//
 		RadioGroup rg = (RadioGroup)getLayoutInflater().inflate(R.layout.friend_order, null);
@@ -326,7 +324,6 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 	
 	private void onClickRefresh(){
 		qList.setVisibility(View.INVISIBLE);
-		getSupportActionBar().hide();
 		qPinyin = new QPinyin<Friend>();
 		datas.clear();
 		datasByName = null;
@@ -408,7 +405,6 @@ public class FriendA extends QActivity implements OnClickListener, OnItemClickLi
 								qhttp.setCacheExpire(0L);
 								qhttp2.setCacheExpire(0L);
 							}
-							getSupportActionBar().show();
 							//
 							if(isByName){
 								datasByName = new ArrayList<QPinyin<Friend>.Pinyin>();

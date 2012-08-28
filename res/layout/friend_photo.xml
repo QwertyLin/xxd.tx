@@ -7,9 +7,16 @@
     
      <ImageView 
 	    android:id="@+id/friend_photo"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
+	    android:layout_width="300dip"
+	    android:layout_height="300dip"
 	    android:scaleType="fitCenter"
+	    />
+     
+     <Button 
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@+id/friend_photo"
+	    android:text="取消关注"
 	    />
     
 </RelativeLayout>

@@ -915,6 +915,7 @@ containing a value of this type.
         public static final int abs__title=0x7f05001b;
         public static final int abs__titleDivider=0x7f05001c;
         public static final int abs__up=0x7f05000b;
+        public static final int blue=0x7f05004a;
         public static final int dialog_loading_in=0x7f050029;
         public static final int dialog_loading_layout=0x7f050027;
         public static final int dialog_loading_out=0x7f050028;
@@ -953,10 +954,10 @@ containing a value of this type.
         public static final int login_pic=0x7f050042;
         public static final int login_token=0x7f050040;
         public static final int login_token_name=0x7f050044;
-        public static final int menu_settings=0x7f05004c;
+        public static final int menu_settings=0x7f05004d;
         public static final int normal=0x7f050001;
-        public static final int photo_save_new=0x7f05004b;
-        public static final int photo_save_old=0x7f05004a;
+        public static final int photo_save_new=0x7f05004c;
+        public static final int photo_save_old=0x7f05004b;
         public static final int showCustom=0x7f050008;
         public static final int showHome=0x7f050005;
         public static final int showTitle=0x7f050007;

@@ -15,7 +15,9 @@ public class MainA extends QActivity {
     public void onCreate(Bundle savedInstanceState) {
     	QLog.log("onCreate");
         super.onCreate(savedInstanceState);
-        startActivity(new Intent(this, LoginA.class));
+        setContentView(R.layout.main);
+        
+        /*startActivity(new Intent(this, LoginA.class));
         
        	if("android.intent.action.GET_CONTENT".equals(getIntent().getAction())){
        		QLog.log("From 相册");
@@ -25,7 +27,7 @@ public class MainA extends QActivity {
        	}else{
        		getQApp().setFromOut(false);
            	finish();
-       	}
+       	}*/
     }
     
     

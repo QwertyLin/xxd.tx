@@ -1,22 +1,34 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent" 
-    android:orientation="vertical"
     >
 
-    <!-- <include layout="@layout/layout_header_btn_right"/> -->
-    
-    <ScrollView 
+    <Button 
+        android:id="@+id/blue"
         android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        >
-        <GridView 
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:numColumns="4"
-            >
-        </GridView>
-    </ScrollView>
-</LinearLayout>
+        android:layout_height="300dip"
+        android:background="#33b5e5"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:drawableTop="@drawable/a_action_settings"
+        android:text="文本"
+        android:textColor="#FFFFFF"
+        />
+    
+    <Button 
+        android:layout_width="50dip"
+        android:layout_height="50dip"
+        android:background="#ffbb33"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_below="@id/blue"
+        android:text="SSSSSSSSSSSSSSSSSSSSSSAAAAAAAAAAA"
+        android:ellipsize="end"
+        
+        android:textColor="#FFFFFF"
+        />
+    
+</RelativeLayout>
